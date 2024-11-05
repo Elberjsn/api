@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
+		integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+		crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+	<script>
+
+		let carregarSelect = () => {
+			var elems = document.querySelectorAll('select');
+			var instances = M.FormSelect.init(elems);
+		}
+
+		//de suma importante para carregar select (materialize)
+		document.addEventListener('DOMContentLoaded', function () {
+			//dividida em uma função para reutilização
+			carregarSelect()
+
+
+		});
+
+
+
+		function editProd(id) {
+
+			if(!$( "#addPrdo" ).is( ":visible" )){
+				buscarpd();
+			}
+
+			let camposTable = {
+				"Produto": document.getElementById("prod-" + id).innerText,
+				"Quantidade": document.getElementById("qtd-" + id).innerText,
+				"Valor": document.getElementById("valor-" + id).innerText,
+				"Departamento": document.getElementById("dep-" + id).attributes.value.value
+			}
+
+			document.getElementById("idpro").value = id
+			document.getElementById("prod").value = camposTable.Produto
+			document.getElementById("qtd").value = camposTable.Quantidade
+			document.getElementById("valor").value = camposTable.Valor
+			document.getElementById("deps").value = camposTable.Departamento
+
+
+			carregarSelect()
+			$("#qtd,#valor,#prod").focus().blur();
+			$("#group-btns").toggle()
+
+		}
+		function resetForm() {
+			document.getElementById("idpro").value = null
+			carregarSelect()
+			$("#prod").focus().blur();
+			$("#group-btns").toggle();
+		}
+		
+		function buscarpd(){
+			$("#addPrdo , #buscarProd").toggle()
+			envia("/buscar","GET","nameprd=none")
+			
+		}
+
+		function envia(caminho,methodo,dados){
+				$.ajax({
+					url: caminho,
+					type: methodo,
+					data: dados,
+					success: function(response) {
+						$("#tb_Prd").html(response);
+					}
+				});
+			
+		}
+		$(document).ready(function() {
+			$("#formBuscar").submit(function(e) {
+
+				e.preventDefault();
+				envia("/buscar","GET",$(this).serialize())
+			});
+		});
+
+	</script>
+	<style>
+		a {
+			color: inherit;
+		}
+
+		.error {
+			color: red;
+		}
+
+		.btn-flat:hover{
+			background-color: transparent;
+			border-radius: 10px;
+			border: 1px solid;
+		}
+	</style>
+
+	
+</head>
+
+<body>
+	
+	<div th:replace="~{fragments :: header}"></div>
+	
+		<main>
+		<div class="row"></div>
+		<div class="container z-depth-5">
+
+			<div class="row" id="addPrdo">
+				<form class="col s12" action="#" th:action="@{/}" th:object="${prd}" method="post"
+					onreset="resetForm()">
+					<input id="idpro" th:field="*{idProdutos}" type="hidden" class="validate" value="">
+					<div class="row">
+						<div class="input-field col s6">
+							<i class="material-icons prefix">content_paste</i>
+							<label for="prod">Produto</label>
+							<input id="prod" th:field="*{nomeProduto}" type="text" class="validate">
+							<p th:if="${#fields.hasErrors('nomeProduto')}" class="error">Nome do Produto Invalido</p>
+
+						</div>
+						<div class="input-field col s6">
+							<i class="material-icons prefix">exposure_zero</i>
+							<input id="qtd" th:field="*{qtdEstoque}" type="number" min="1" class="validate">
+							<label for="qtd">Quantidade</label>
+							<p th:if="${#fields.hasErrors('qtdEstoque')}" class="error">Quantidade Invalido</p>
+						</div>
+
+					</div>
+					<div class="row">
+						<div class="input-field col s6">
+							<i class="material-icons prefix">euro_symbol</i>
+							<input id="valor" th:field="*{valor}" type="number" step=".1" min="0.0" class="validate">
+							<label for="valor">Valor</label>
+							<p th:if="${#fields.hasErrors('valor')}" class="error">Valor Invalido</p>
+						</div>
+
+						<div class="input-field col s6">
+							<i class="material-icons prefix">add_circle_outline</i>
+
+							<select id="deps" th:field="*{departamento_id}">
+
+								<option value="" selected>Selecione um Departamento</option>
+								<option th:each="i : ${deps}" th:value="${i.idDepartamento}"
+									th:text="${i.nomeDepartamento}">
+								</option>
+
+							</select>
+							<label for="deps">Selecione um Departamento</label>
+							<p th:if="${#fields.hasErrors('departamento_id')}" class="error">Selecione um Departamento
+								Valido</p>
+						</div>
+
+					</div>
+					<div class="row" >
+
+						<div class="  col s12 offset-s1">
+							<div class="row">
+								<button class="col s3 btn waves-effect waves-light" type="submit"
+									name="action">Cadastrar
+									<i class="material-icons right">send</i>
+								</button>
+
+								<div class="col s6 offset-s3" id="group-btns" style="display: none;">
+									<button class="btn waves-effect yellow accent-4" type="reset" name="action">limpar
+										<i class="material-icons right">clear</i>
+									</button>
+									<a class="btn waves-effect red accent-4" name="action">Deletar
+										<i class="material-icons center " alt="deletar Produto">delete</i>
+									</a>
+								</div>
+							</div>
+						</div>
+
+					</div>
+				</form>
+
+
+
+
+			</div>
+
+			<div class="row" id="buscarProd" style="display: none;">
+				<form method="GET" id="formBuscar">
+					<div class="row">
+						<div class="input-field col s6">
+							<i class="material-icons prefix">content_paste</i>
+							<label for="buscarPrd">Produto</label>
+							<input id="buscarPrd" name="nameprd" th:value="${nameprd}" type="text" class="validate">
+						</div>
+						<div class="input-field col s3">
+							<button class="btn waves-effect green" type="submit">Buscar
+								<i class="material-icons right">search</i>
+							</button>
+
+
+						</div>
+						<div class="input-field col s3">
+
+
+							<button class="btn waves-effect grey" type="submit" onclick="buscarpd()">Voltar
+								<i class="material-icons right">refresh</i>
+							</button>
+						</div>
+
+					</div>
+				</form>
+			</div>
+
+			<div th:replace="~{fragments :: tb_Prd}"></div>
+
+			
+		</div>
+	</main>
+</body>
+
+</html>

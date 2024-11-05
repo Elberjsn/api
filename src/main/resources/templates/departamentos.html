@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+	<script>
+		troca=true;
+		function buscardep(){	
+			const form = document.getElementById('formDep');
+
+			if(troca){
+				form.method="GET"
+				document.getElementById("btnForm").textContent = "Buscar"
+				troca = false
+			}else{
+				form.setAttribute('action', '/dep');
+				document.getElementById("btnForm").innerText = "Cadastrar"
+				form.method="Post"
+				troca=true;
+			}
+		}
+
+		$(document).ready(function(){
+			$("#formDep").submit(function(e){
+				
+				if($(this).attr('method') == "GET"){
+					
+					e.preventDefault();
+					envia($("nomeDep").val)
+				}
+			});
+		});
+
+		function envia(dados){
+			$.ajax({
+				url: "/buscardep",
+				type: "GET",
+				data: dados,
+				success: function(response) {
+					$("#tb_dep").html(response);
+				}
+			});
+		
+	}
+
+		function editProd(id){
+			if(id!=0){			let camposTable={
+							"Departamento":["dep-"+id]
+						}
+						document.getElementById("nomeDep").value =  document.getElementById(camposTable.Departamento).innerText	
+						document.getElementById("idDep").value =  id;		
+						document.getElementById("btn-delete").href="/deletarDep/"+id
+						
+						
+						$("#nomeDep").focus().blur();
+						}
+			$("#group-btns").toggle()
+		}
+		
+	</script>
+	<style>
+		a{color: inherit;}
+		.error{
+			color:red;
+		}
+		.btn-flat:hover{
+			background-color: transparent;
+			border-radius: 10px;
+			border: 1px solid;
+		}
+	</style>
+</head>
+
+<body>
+
+	<div th:replace="~{fragments :: header}"></div>
+
+</div>
+	<main>
+		<div class="row"></div>
+		<div class="container z-depth-5">
+			
+			<div class="row">
+				<form class="col s12" action="#" th:action="@{/dep}" th:object="${departamento}"  id="formDep" method="post">
+					<input id="idDep" th:field="*{idDepartamento}" type="hidden" class="validate" value="0">
+					<div class="row">
+						<div class="input-field col s6">
+							<i class="material-icons prefix">archive</i>
+							<label for="nomeDep" >Departamento</label>
+							<input id="nomeDep" th:field="*{nomeDepartamento}" type="text" class="validate">
+							<span th:if="${#fields.hasErrors('nomeDepartamento')}" class="error">Nome do Departamento Invalido</span>
+
+						</div>
+						
+					</div>
+					<div class="row" >
+
+						<div class="  col s12 offset-s1" >
+							<div class="row">
+								<button class="col s3 btn waves-effect waves-light" type="submit" id="btnForm">Cadastrar
+									<i class="material-icons right">send</i>
+								</button>
+
+								<div class="col s6 offset-s3" id="group-btns" style="display: none;">
+									<button class="btn waves-effect yellow accent-4" type="reset" name="action" onclick="editProd(0)">limpar 
+										<i class="material-icons right">clear</i>
+									</button>
+									<a class="btn waves-effect red accent-4" id="btn-delete" href="#" name="action">Deletar 
+										<i class="material-icons right">delete</i>
+									</a>
+								</div>
+							</div>
+						</div>
+
+					</div>
+				</form>
+			</div>
+
+			<div th:replace="~{fragments :: tb_Dep}"></div>
+		</div>
+	</main>
+</body>
+
+</html>

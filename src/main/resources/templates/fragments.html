@@ -1,0 +1,111 @@
+<!--fragment Cabeçalho -->
+
+<header th:fragment="header">
+    <nav>
+        <div class="nav-wrapper">
+            <div th:if="${title == 'Departamentos'}">
+                <a href="/dep" class="brand-logo">Departamentos</a>
+                
+                <ul id="nav-mobile" class="right hide-on-med-and-down">
+                    <li><a href="/img" class="btn-flat btn-large  white-text "> Diagrama</a></li>
+                    <li><a class="btn-flat btn-large  white-text" onclick="buscardep()"> Buscar Departamento</a></li>
+                    <li><a href="/" class="btn-flat  white-text btn-large">Produtos</a></li>
+                </ul>
+            </div>
+
+            <div th:if="${title == 'Produtos'}">
+                <a href="/" class="brand-logo">Produtos</a>
+                <ul id="nav-mobile" class="right hide-on-med-and-down">
+                    <li><a href="/img" class="btn-flat btn-large  white-text "> Diagrama</a></li>
+                    <li><a class="btn-flat btn-large  white-text" onclick="buscarpd()"> Buscar Produtos</a></li>
+                    <li><a href="/dep" class="btn-flat  white-text btn-large">Departamentos</a></li>
+                </ul>
+            </div>
+            <div th:if="${title == 'Diagrama'}">
+                <a href="/" class="brand-logo">Diagramas</a>
+                <ul id="nav-mobile" class="right hide-on-med-and-down">
+                    <li><a href="/" class="btn-flat  white-text btn-large">Produtos</a></li>
+                    <li><a href="/dep" class="btn-flat  white-text btn-large">Departamentos</a></li>
+                </ul>
+            </div>
+
+        </div>
+    </nav>
+</header>
+
+<!--fragment Tabela de Departamentos -->
+
+<div class="row" th:fragment="tb_Dep" id="tb_dep">
+
+    <div class=" col s10 offset-s1">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID do Departamento</th>
+                    <th>Nome do Departamento</th>
+                    <th>Valor do Dep. em Prod.</th>
+                    <th>Opções</th>
+                    
+                </tr>
+            </thead>
+
+            <tbody>
+                
+                <tr th:each=" tD : ${todosDep}">
+                    <td    th:text="*{tD.idDepartamento}">#</td>
+                    <td  th:attr="id='dep-'+*{tD.idDepartamento}" th:text="${tD.nomeDepartamento}">Sem Departamentos</td>
+                    <td  th:text="${tD.valorDep}">0</td>
+                    <td>
+                        <i class="material-icons left" alt="Editar Produto" style="cursor: pointer;" th:attr="onclick=|editProd('${tD.idDepartamento}')|" >edit</i>
+                        <a th:href="'/deletarDep/'+*{tD.idDepartamento}"><i class="material-icons center " alt="deletar Produto">delete</i></a>
+                    </td>
+                </tr>
+
+                
+                
+
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!--fragment Tabela de Produtos -->
+
+
+<div class="row" id="tb_Prd" th:fragment="tb_Prd">
+    <div class=" col s10 offset-s1">
+        <table>
+            <thead>
+                <tr>
+                    <th>Nome do Produto</th>
+                    <th>Quantidade</th>
+                    <th>Valor</th>
+                    <th>Departamento</th>
+                    <th>Opções</th>
+
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr th:each=" produto : ${produtos}">
+                    <td th:id="'prod-'+*{produto.idProdutos}" th:text="*{produto.nomeProduto}"></td>
+                    <td th:id="'qtd-'+*{produto.idProdutos}" th:text="*{produto.qtdEstoque}"> </td>
+                    <td th:id="'valor-'+*{produto.idProdutos}" th:text="*{produto.valor} "></td>
+                    <td th:id="'dep-'+*{produto.idProdutos}"
+                        th:value="${produto.departamento_id.idDepartamento}"
+                        th:text="*{produto.departamento_id.nomeDepartamento} "></td>
+                    <td>
+                        <i class="material-icons left" alt="Editar Produto"
+                            th:attr="onclick=|editProd(${produto.idProdutos})|">edit</i>
+                        <a th:href="'/deleteProd/'+*{produto.idProdutos}"><i class="material-icons center "
+                                alt="deletar Produto">delete</i></a>
+                    </td>
+                </tr>
+
+
+
+
+            </tbody>
+        </table>
+    </div>
+</div>
