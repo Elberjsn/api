@@ -32,7 +32,7 @@ public class Produtos {
 	private Double valor;
 
 	@NotNull(message = "Escolha um departamento")
-	@ManyToOne(cascade = CascadeType.ALL)
+	@ManyToOne(cascade = CascadeType.PERSIST)
 	@JoinColumn(name = "departamento_id")
 	private Departamento departamento_id;
 

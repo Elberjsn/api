@@ -16,10 +16,12 @@
 			if(troca){
 				form.method="GET"
 				document.getElementById("btnForm").textContent = "Buscar"
+				document.getElementById("btnbuscaDep").textContent = "Listar Todos Departamentos"
 				troca = false
 			}else{
 				form.setAttribute('action', '/dep');
 				document.getElementById("btnForm").innerText = "Cadastrar"
+				document.getElementById("btnbuscaDep").textContent = "Buscar Departamento"
 				form.method="Post"
 				troca=true;
 			}
@@ -31,18 +33,19 @@
 				if($(this).attr('method') == "GET"){
 					
 					e.preventDefault();
-					envia($("nomeDep").val)
+					envia("nomedep="+$("#nomeDep").val())
 				}
 			});
 		});
 
 		function envia(dados){
+			console.log(dados)
 			$.ajax({
 				url: "/buscardep",
 				type: "GET",
 				data: dados,
 				success: function(response) {
-					$("#tb_dep").html(response);
+					$("#tb-dep").html(response);
 				}
 			});
 		
@@ -94,7 +97,7 @@
 							<label for="nomeDep" >Departamento</label>
 							<input id="nomeDep" th:field="*{nomeDepartamento}" type="text" class="validate">
 							<span th:if="${#fields.hasErrors('nomeDepartamento')}" class="error">Nome do Departamento Invalido</span>
-
+							<span th:if="${errodep}" class="error" th:text="${errodep}">Nome do Departamento Invalido</span>
 						</div>
 						
 					</div>
@@ -121,7 +124,7 @@
 				</form>
 			</div>
 
-			<div th:replace="~{fragments :: tb_Dep}"></div>
+			<div th:replace="~{fragments :: tb-dep}" ></div>
 		</div>
 	</main>
 </body>

@@ -3,13 +3,15 @@ package com.atividade.manyToOne.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.atividade.manyToOne.model.Departamento;
 import com.atividade.manyToOne.model.Produtos;
 import com.atividade.manyToOne.repository.ProdutosRepository;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Persistence;
 
 @Service
 public class ProdutoService {
@@ -20,37 +22,28 @@ public class ProdutoService {
 	@Autowired
 	DepartamentoService departamentoService;
 
-	public List<Produtos> todosOS;
-
-	@CacheEvict(value = "todosprds")
 	public void novoProduto(Produtos prod) {
 		Departamento dep = departamentoService.buscarPorNome(prod.getDepartamento_id().getNomeDepartamento());
 
 		prod.setDepartamento_id(dep);
 
-		Double valor = (prod.getValor() * prod.getQtdEstoque()) + dep.getValorDep();
-		dep.setValorDep(valor);
-
-		departamentoService.addValor(dep);
-
 		try {
+			
 			produtosRepository.save(prod);
-			todosOS.add(prod);
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 	}
 
-	@Cacheable(value = "todosprds")
 	public List<Produtos> buscarTodosProdutos() {
-		todosOS = produtosRepository.findAll();
+		List<Produtos> prd = produtosRepository.findAll();
 
-		if (todosOS.isEmpty()) {
+		if (prd.isEmpty()) {
 			return null;
 		} else {
-			return todosOS;
+			return prd;
 		}
 
 	}
@@ -67,21 +60,26 @@ public class ProdutoService {
 		return produtosRepository.buscarPorNome(nome);
 	}
 
-	@CacheEvict(value = "todosprds")
 	public void alterarProduto(Produtos prod) {
-		Produtos newProd = buscarProdutoId(prod);
 
-		newProd.setNomeProduto(prod.getNomeProduto());
-		newProd.setQtdEstoque(prod.getQtdEstoque());
-		newProd.setValor(prod.getValor());
+		EntityManagerFactory emf = Persistence.createEntityManagerFactory("Produtos");
+		EntityManager em = emf.createEntityManager();
 
-		novoProduto(newProd);
+		em.getTransaction().begin();
+
+		Produtos prd = em.find(Produtos.class, prod.getIdProdutos());
+
+		prd.setNomeProduto(prod.getNomeProduto());
+		prd.setQtdEstoque(prod.getQtdEstoque());
+		prd.setValor(prod.getValor());
+		em.merge(prd);
+		em.getTransaction().commit();
+		em.close();
+		emf.close();
 	}
 
-	@CacheEvict(value = "todosprds")
 	public void deletarProduto(Produtos prod) {
-		todosOS.remove(prod);
-		produtosRepository.delete(prod);
+		produtosRepository.deleteById(prod.getIdProdutos());
 	}
 
 	public void deleteById(int id) {

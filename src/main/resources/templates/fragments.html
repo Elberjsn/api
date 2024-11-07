@@ -8,7 +8,8 @@
                 
                 <ul id="nav-mobile" class="right hide-on-med-and-down">
                     <li><a href="/img" class="btn-flat btn-large  white-text "> Diagrama</a></li>
-                    <li><a class="btn-flat btn-large  white-text" onclick="buscardep()"> Buscar Departamento</a></li>
+                    <li><a class="btn-flat btn-large  white-text"
+                        id="btnbuscaDep" onclick="buscardep()"> Buscar Departamento</a></li>
                     <li><a href="/" class="btn-flat  white-text btn-large">Produtos</a></li>
                 </ul>
             </div>
@@ -35,7 +36,7 @@
 
 <!--fragment Tabela de Departamentos -->
 
-<div class="row" th:fragment="tb_Dep" id="tb_dep">
+<div class="row" th:fragment="tb-dep" id="tb-dep" >
 
     <div class=" col s10 offset-s1">
         <table>
@@ -43,7 +44,7 @@
                 <tr>
                     <th>ID do Departamento</th>
                     <th>Nome do Departamento</th>
-                    <th>Valor do Dep. em Prod.</th>
+                   
                     <th>Opções</th>
                     
                 </tr>
@@ -54,7 +55,7 @@
                 <tr th:each=" tD : ${todosDep}">
                     <td    th:text="*{tD.idDepartamento}">#</td>
                     <td  th:attr="id='dep-'+*{tD.idDepartamento}" th:text="${tD.nomeDepartamento}">Sem Departamentos</td>
-                    <td  th:text="${tD.valorDep}">0</td>
+                   
                     <td>
                         <i class="material-icons left" alt="Editar Produto" style="cursor: pointer;" th:attr="onclick=|editProd('${tD.idDepartamento}')|" >edit</i>
                         <a th:href="'/deletarDep/'+*{tD.idDepartamento}"><i class="material-icons center " alt="deletar Produto">delete</i></a>

@@ -12,7 +12,7 @@ import com.atividade.manyToOne.model.Departamento;
 @Repository
 public interface DepartamentoRepository extends JpaRepository<Departamento, Integer> {
 	
-	@Query("select d from Departamento d where d.nomeDepartamento =:nome")
+	@Query("select d from Departamento d where d.nomeDepartamento LIKE %:nome%")
 	List<Departamento> buscarPorNome(@Param("nome")String nome);
 	
 }

@@ -1,7 +1,5 @@
 package com.atividade.manyToOne.controller;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,17 +21,15 @@ public class DepartamentoController {
 	@Autowired
 	DepartamentoService departamentoService;
 
-	List<Departamento> dps;
 	
 	
 	@GetMapping("/dep")
 	public String departamentoIndex(Model model) {
 
-		this.dps = departamentoService.buscarDepartamentos();
 		
 		model.addAttribute("title", "Departamentos");
 
-		model.addAttribute("todosDep", this.dps);
+		model.addAttribute("todosDep", departamentoService.buscarDepartamentos());
 		
 		Departamento dep = new Departamento();
 		dep.setIdDepartamento(0);
@@ -44,7 +40,7 @@ public class DepartamentoController {
 	@PostMapping("/dep")
 	public String newDepartamento(@Valid @ModelAttribute("departamento") Departamento departamento, BindingResult result, Model model) {
 		
-		model.addAttribute("todosDep", this.dps);
+		model.addAttribute("todosDep", departamentoService.buscarDepartamentos());
 
 		if (result.hasErrors()) {
 			model.addAttribute("title", "Departamentos");
@@ -65,17 +61,29 @@ public class DepartamentoController {
 	@GetMapping("/deletarDep/{id}")
 	public String deletarDepartamento(@PathVariable("id") int id, Model model) {
 		Departamento del = departamentoService.buscarDepartamentoId(id);
-		departamentoService.deletarDepartamento(del);
-		model.addAttribute("title", "Departamentos");
-		return "redirect:/dep";
+		
+		
+		if(del.getProdutos().size()>0) {
+			model.addAttribute("title", "Departamentos");
+			model.addAttribute("todosDep", departamentoService.buscarDepartamentos());
+			Departamento dep = new Departamento();
+			dep.setIdDepartamento(0);
+			model.addAttribute("departamento",dep);
+			model.addAttribute("errodep", "Há Produtos cadastrados neste departamento");
+			return "departamentos";
+		}else {
+			departamentoService.deletarDepartamento(del);
+			return "redirect:/dep";
+		}
+		
+		
+		
 	}
 
 	@GetMapping("/buscardep")
-	public String buscarDepartamento(@RequestParam(name = "namedep") String nome,Model model){
-
+	public String buscarDepartamento(@RequestParam(name = "nomedep") String nome,Model model){
 		model.addAttribute("todosDep",departamentoService.buscarPorNome(nome));
 
-
-		return "fragments :: tb_dep";
+		return "fragments :: tb-dep";
 	}
 }

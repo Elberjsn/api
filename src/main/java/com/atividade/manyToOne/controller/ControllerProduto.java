@@ -1,7 +1,5 @@
 package com.atividade.manyToOne.controller;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,7 +10,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.atividade.manyToOne.model.Departamento;
 import com.atividade.manyToOne.model.Produtos;
 import com.atividade.manyToOne.service.DepartamentoService;
 import com.atividade.manyToOne.service.ProdutoService;
@@ -27,18 +24,12 @@ public class ControllerProduto {
 	@Autowired
 	DepartamentoService departamentoService;
 
-	List<Departamento> deps;
-	List<Produtos> prods;
-
-	
 	@GetMapping("/")
 	public String produtos(Model model) {
-		this.deps = departamentoService.buscarDepartamentos();
-		this.prods = produtoService.buscarTodosProdutos();
 
 		model.addAttribute("title", "Produtos");
-		model.addAttribute("deps", this.deps);
-		model.addAttribute("produtos", this.prods);
+		model.addAttribute("deps", departamentoService.buscarDepartamentos());
+		model.addAttribute("produtos",  produtoService.buscarTodosProdutos());
 		model.addAttribute("prd", new Produtos());
 
 		return "index";
@@ -75,7 +66,7 @@ public class ControllerProduto {
 		
 		
 		if (nome.equals("none")) {
-			model.addAttribute("produtos", this.prods);
+			model.addAttribute("produtos", produtoService.buscarTodosProdutos());
 		}else{
 			model.addAttribute("produtos", produtoService.buscarPorNome(nome));
 		}
